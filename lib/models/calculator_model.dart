@@ -4,13 +4,17 @@ import 'package:intl/intl.dart'; // Digunakan untuk format timestamp
 
 class CalculatorModel with ChangeNotifier {
   String _display = ''; // Menyimpan semua input operasi
-  List<String> _history = []; // Menyimpan riwayat perhitungan
+  final List<String> _history = []; // Menyimpan riwayat perhitungan
+  bool _isDarkMode = false; // State untuk mode gelap/terang
 
   // Getter untuk tampilan layar
   String get display => _display.isEmpty ? '0' : _display;
 
   // Getter untuk history
   List<String> get history => _history;
+
+  // Getter untuk mengetahui mode saat ini
+  bool get isDarkMode => _isDarkMode;
 
   // Fungsi untuk menambahkan angka atau operator ke layar
   void addInput(String input) {
@@ -53,6 +57,12 @@ class CalculatorModel with ChangeNotifier {
   // Fungsi untuk menghapus history
   void clearHistory() {
     _history.clear();
+    notifyListeners();
+  }
+
+  // Fungsi untuk mengubah mode tema
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
     notifyListeners();
   }
 }
