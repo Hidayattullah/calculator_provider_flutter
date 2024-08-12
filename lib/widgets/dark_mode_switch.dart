@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '/models/calculator_model.dart';
 
 class DarkModeSwitch extends StatelessWidget {
+  const DarkModeSwitch({super.key});
+
   @override
   Widget build(BuildContext context) {
     var model = context.watch<CalculatorModel>(); // Mengambil model dari Provider

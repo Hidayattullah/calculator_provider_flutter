@@ -1,94 +1,92 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
-import 'package:intl/intl.dart'; // Digunakan untuk format timestamp
+import 'package:intl/intl.dart';
+
+import 'button_model.dart';
+import 'display_model.dart';
+import 'history_model.dart';
+import 'theme_model.dart';
+
 
 class CalculatorModel with ChangeNotifier {
-  String _display = ''; // Menyimpan semua input operasi
-  final List<String> _history = []; // Menyimpan riwayat perhitungan
-  bool _isDarkMode = false; // State untuk mode gelap/terang
+  final DisplayModel _displayState = DisplayModel();
+  final HistoryModel _historyManager = HistoryModel();
+  final ThemeModel _themeManager = ThemeModel();
+  final ButtonModel _buttonStateManager = ButtonModel();
 
   // Getter untuk tampilan layar
-  String get display => _display.isEmpty ? '0' : _display;
+  String get display => _displayState.display;
 
   // Getter untuk history
-  List<String> get history => _history;
+  List<String> get history => _historyManager.history;
 
   // Getter untuk mengetahui mode saat ini
-  bool get isDarkMode => _isDarkMode;
-
-  // Hover untuk animasi tombolnya
-  String? _hoveredButton;
-  String? _pressedButton;
+  bool get isDarkMode => _themeManager.isDarkMode;
 
   // Fungsi untuk menambahkan angka atau operator ke layar
   void addInput(String input) {
-    _display += input;
-    notifyListeners(); // Memberitahukan perubahan state
+    _displayState.addInput(input);
+    notifyListeners();
   }
 
   // Fungsi untuk menghitung hasil
   void calculate() {
     try {
       Parser parser = Parser();
-      Expression expression = parser.parse(_display); // Parse ekspresi matematika
+      Expression expression = parser.parse(_displayState.display);
       ContextModel cm = ContextModel();
       double result = expression.evaluate(EvaluationType.REAL, cm);
 
       String timestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-      _history.add('$_display = $result at $timestamp'); // Simpan operasi dengan hasil dan timestamp
+      _historyManager.addHistory('${_displayState.display} = $result at $timestamp');
 
-      _display = result.toString(); // Menampilkan hasil
+      _displayState.setDisplay(result.toString());
     } catch (e) {
-      _display = 'Error'; // Jika ada kesalahan dalam perhitungan
+      _displayState.setDisplay('Error');
     }
     notifyListeners();
   }
 
   // Fungsi untuk menghapus semua input
   void clear() {
-    _display = '';
+    _displayState.clear();
     notifyListeners();
   }
 
   // Fungsi untuk menghapus karakter terakhir (backspace)
   void delete() {
-    if (_display.isNotEmpty) {
-      _display = _display.substring(0, _display.length - 1);
-      notifyListeners();
-    }
+    _displayState.delete();
+    notifyListeners();
   }
 
   // Fungsi untuk menghapus history
   void clearHistory() {
-    _history.clear();
+    _historyManager.clearHistory();
     notifyListeners();
   }
 
   // Fungsi untuk mengubah mode tema
   void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
+    _themeManager.toggleTheme();
     notifyListeners();
   }
 
-  // Setel tombol yang sedang di-hover
+  // Fungsi terkait hover dan tekan tombol
   void setHoverButton(String? button) {
-    _hoveredButton = button;
+    _buttonStateManager.setHoverButton(button);
     notifyListeners();
   }
 
-  // Setel tombol yang sedang ditekan
   void setPressedButton(String? button) {
-    _pressedButton = button;
+    _buttonStateManager.setPressedButton(button);
     notifyListeners();
   }
 
-  // Periksa apakah tombol sedang dihover
   bool isButtonHovered(String button) {
-    return _hoveredButton == button;
+    return _buttonStateManager.isButtonHovered(button);
   }
 
-  // Periksa apakah tombol sedang ditekan
   bool isButtonPressed(String button) {
-    return _pressedButton == button;
+    return _buttonStateManager.isButtonPressed(button);
   }
 }
