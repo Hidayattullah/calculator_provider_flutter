@@ -21,7 +21,7 @@ class CalculatorScreen extends StatelessWidget {
             color: model.isDarkMode ? Colors.white : Colors.black, // Warna teks AppBar sesuai mode
           ),
         ),
-        actions: [
+        actions: const [
           DarkModeSwitch(), // Menggunakan widget Dark Mode Switch
         ],
       ),
