@@ -1,75 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart'; // Import untuk menangani input dari keyboard
+import '/widgets/dark_mode_switch.dart';
+import '/widgets/keyboard_listener.dart';
+import '/widgets/history_drawer.dart';
 import '/models/calculator_model.dart';
 
 class CalculatorScreen extends StatelessWidget {
   CalculatorScreen({super.key});
+  
   @override
   Widget build(BuildContext context) {
-    var model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
+    final model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kalkulator Responsif'),
         actions: [
-          Switch(
-            value: model.isDarkMode,
-            onChanged: (value) {
-              model.toggleTheme(); // Ubah tema
-            },
-          ),
+          DarkModeSwitch(), // Menggunakan widget Dark Mode Switch
         ],
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blueAccent,
-              ),
-              child: Text(
-                'History',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ...model.history.map((entry) => ListTile(
-              title: Text(entry),
-            )),
-            if (model.history.isNotEmpty)
-              ListTile(
-                title: const Text(
-                  'Clear History',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
-                  model.clearHistory(); // Bersihkan history
-                  Navigator.of(context).pop(); // Tutup drawer setelah menghapus
-                },
-              ),
-          ],
-        ),
-      ),
-      body: Focus(
-        autofocus: true,
-        onKeyEvent: (node, event) {
-          if (event is KeyDownEvent) {
-            // Menggunakan event.character untuk menangkap input karakter dari keyboard
-            final key = event.character ?? '';
-            if (buttons.contains(key)) {
-              onButtonPressed(model, key);
-            } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-              model.calculate();
-            } else if (event.logicalKey == LogicalKeyboardKey.backspace) {
-              model.delete();
-            }
-          }
-          return KeyEventResult.handled;
-        },
+      drawer: const HistoryDrawer(), // Menggunakan widget History Drawer
+      body: KeyboardListenerWidget(
         child: Container(
           color: model.isDarkMode ? Colors.black : Colors.white, // Mengatur warna background berdasarkan mode
           child: Column(
@@ -135,8 +86,6 @@ class CalculatorScreen extends StatelessWidget {
     'C', '0', '=', '+',
     '<-', // Tombol Backspace
   ];
-
-  
 
   // Fungsi untuk mengatur apa yang terjadi saat tombol ditekan
   void onButtonPressed(CalculatorModel model, String buttonText) {
