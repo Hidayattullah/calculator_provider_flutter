@@ -7,11 +7,12 @@ class DarkModeSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     var model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
 
-    return Switch(
-      value: model.isDarkMode,
-      onChanged: (value) {
+    return IconButton(
+      icon: const Icon(Icons.brightness_6),
+      onPressed: () {
         model.toggleTheme(); // Ubah tema
       },
+      color: model.isDarkMode ? Colors.white : Colors.black, // Sesuaikan warna ikon
     );
   }
 }

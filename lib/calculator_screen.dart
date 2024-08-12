@@ -7,14 +7,20 @@ import '/models/calculator_model.dart';
 
 class CalculatorScreen extends StatelessWidget {
   CalculatorScreen({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
+    var model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kalkulator Responsif'),
+        backgroundColor: model.isDarkMode ? Colors.black : Colors.blueAccent, // Warna AppBar sesuai mode
+        title: Text(
+          'Kalkulator Responsif',
+          style: TextStyle(
+            color: model.isDarkMode ? Colors.white : Colors.black, // Warna teks AppBar sesuai mode
+          ),
+        ),
         actions: [
           DarkModeSwitch(), // Menggunakan widget Dark Mode Switch
         ],
@@ -49,20 +55,48 @@ class CalculatorScreen extends StatelessWidget {
                   itemCount: buttons.length, // Total tombol
                   itemBuilder: (context, index) {
                     String buttonText = buttons[index];
-                    return GestureDetector(
-                      onTap: () => onButtonPressed(model, buttonText),
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            buttonText,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              color: Colors.white,
+                    Color? buttonColor;
+                    Color textColor = model.isDarkMode ? Colors.white : Colors.white;
+
+                    // Mengatur warna tombol berdasarkan jenisnya
+                    if (buttonText == 'C') {
+                      buttonColor = Colors.red; // Tombol 'C' berwarna merah
+                    } else if (['+', '-', '*', '/'].contains(buttonText)) {
+                      buttonColor = Colors.green; // Tombol operasi berwarna hijau
+                    } else {
+                      buttonColor = model.isDarkMode ? Colors.grey[800] : Colors.blueAccent; // Tombol lainnya
+                    }
+
+                    return MouseRegion(
+                      onEnter: (_) => model.setHoverButton(buttonText), // Setel tombol yang sedang dihover
+                      onExit: (_) => model.setHoverButton(null), // Hapus tombol yang sedang dihover
+                      child: GestureDetector(
+                        onTapDown: (_) => model.setPressedButton(buttonText), // Setel tombol yang ditekan
+                        onTapUp: (_) => model.setPressedButton(null), // Hapus setelan tombol yang ditekan
+                        onTapCancel: () => model.setPressedButton(null), // Mengatasi jika tap dibatalkan
+                        onTap: () => onButtonPressed(model, buttonText), // Logika saat tombol ditekan
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 100), // Efek animasi
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: model.isDarkMode && model.isButtonPressed(buttonText)
+                                ? buttonColor?.withOpacity(0.5) // Efek klik dalam mode gelap
+                                : model.isDarkMode && model.isButtonHovered(buttonText)
+                                    ? buttonColor?.withOpacity(0.7) // Efek hover dalam mode gelap
+                                    : model.isButtonPressed(buttonText)
+                                        ? buttonColor?.withOpacity(0.7) // Efek klik dalam mode terang
+                                        : model.isButtonHovered(buttonText)
+                                            ? buttonColor?.withOpacity(0.85) // Efek hover dalam mode terang
+                                            : buttonColor, // Warna default
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: Text(
+                              buttonText,
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: textColor, // Warna teks
+                              ),
                             ),
                           ),
                         ),

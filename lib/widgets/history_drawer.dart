@@ -10,36 +10,42 @@ class HistoryDrawer extends StatelessWidget {
     var model = context.watch<CalculatorModel>(); // Mengambil model dari Provider
 
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-            ),
-            child: Text(
-              'History',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+      child: Container(
+        color: model.isDarkMode ? Colors.black : Colors.white, // Warna drawer
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: model.isDarkMode ? Colors.grey[800] : Colors.blueAccent, // Warna header drawer
+              ),
+              child: Text(
+                'History',
+                style: TextStyle(
+                  color: model.isDarkMode ? Colors.white : Colors.white, // Warna teks header drawer
+                  fontSize: 24,
+                ),
               ),
             ),
-          ),
-          ...model.history.map((entry) => ListTile(
-            title: Text(entry),
-          )),
-          if (model.history.isNotEmpty)
-            ListTile(
-              title: const Text(
-                'Clear History',
-                style: TextStyle(color: Colors.red),
+            ...model.history.map((entry) => ListTile(
+              title: Text(
+                entry,
+                style: TextStyle(color: model.isDarkMode ? Colors.white : Colors.black), // Warna teks entry
               ),
-              onTap: () {
-                model.clearHistory(); // Bersihkan history
-                Navigator.of(context).pop(); // Tutup drawer setelah menghapus
-              },
-            ),
-        ],
+            )),
+            if (model.history.isNotEmpty)
+              ListTile(
+                title: const Text(
+                  'Clear History',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  model.clearHistory(); // Bersihkan history
+                  Navigator.of(context).pop(); // Tutup drawer setelah menghapus
+                },
+              ),
+          ],
+        ),
       ),
     );
   }

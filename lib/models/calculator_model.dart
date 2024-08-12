@@ -16,6 +16,10 @@ class CalculatorModel with ChangeNotifier {
   // Getter untuk mengetahui mode saat ini
   bool get isDarkMode => _isDarkMode;
 
+  // Hover untuk animasi tombolnya
+  String? _hoveredButton;
+  String? _pressedButton;
+
   // Fungsi untuk menambahkan angka atau operator ke layar
   void addInput(String input) {
     _display += input;
@@ -64,5 +68,27 @@ class CalculatorModel with ChangeNotifier {
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
     notifyListeners();
+  }
+
+  // Setel tombol yang sedang di-hover
+  void setHoverButton(String? button) {
+    _hoveredButton = button;
+    notifyListeners();
+  }
+
+  // Setel tombol yang sedang ditekan
+  void setPressedButton(String? button) {
+    _pressedButton = button;
+    notifyListeners();
+  }
+
+  // Periksa apakah tombol sedang dihover
+  bool isButtonHovered(String button) {
+    return _hoveredButton == button;
+  }
+
+  // Periksa apakah tombol sedang ditekan
+  bool isButtonPressed(String button) {
+    return _pressedButton == button;
   }
 }
